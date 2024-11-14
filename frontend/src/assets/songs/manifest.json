@@ -1,0 +1,37 @@
+[
+    {
+        "id": 1,
+        "name": "Carol of the Bells",
+        "fileName": "Carol_of_the_Bells.mp3",
+        "imageName": "carol_of_the_bells.png",
+        "movie": "Lindsey Stirling"
+    },
+    {
+        "id": 2,
+        "name": "GOT Theme Song",
+        "fileName": "Game_of_Thrones.mp3",
+        "imageName": "game_of_thrones.png",
+        "movie": "Game of the Thrones"
+    },
+    {
+        "id": 3,
+        "name": "Interstellar Main Theme",
+        "fileName": "Interstellar_Main_Theme.mp3",
+        "imageName": "interstellar.png",
+        "movie": "Interstellar"
+    },
+    {
+        "id": 4,
+        "name": "Pirates of the Caribbean Theme Song",
+        "fileName": "Pirates_of_the_Caribbean.mp3",
+        "imageName": "pirates_of_the_caribbean.png",
+        "movie": "Pirates of the Caribbean"
+    },
+    {
+        "id": 5,
+        "name": "My Heart Will Go On",
+        "fileName": "Titanic_Theme_Song.mp3",
+        "imageName": "titanic.png",
+        "movie": "Titanic"
+    }
+]

@@ -1,0 +1,52 @@
+[
+    {
+        "id": 1,
+        "title": "Yoga For Complete Beginners - 20 Minute Home Yoga Workout!",
+        "category": "Beginner",
+        "duration": "23 min",
+        "instructor": "Adriene",
+        "description": "Yoga for Complete Beginners! Adriene welcomes all levels - complete and total beginners to start here! Hop on the mat and start to build the foundation of your own yoga practice with this 20 minute home workout video! Enjoy, stay mindful and find what feels good.",
+        "thumbnailUrl": "https://i.ytimg.com/vi/v7AYKMP6rOE/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLBVesNtDiJqL-hvo7guLIP3jr8SUw",
+        "videoId": "v7AYKMP6rOE"
+    },
+    {
+        "id": 2,
+        "title": "Restorative Yoga For Stress Relief | 30 Minute Practice",
+        "category": "Intermediate",
+        "duration": "31 min",
+        "instructor": "Jess",
+        "description": "De-stress with this 30 minute calming yoga routine that includes gentle and simple full body stretches for relaxation. Each pose is held for around 2 minutes to give time for the body and mind to slow down, and to help reduce cortisol levels. Bring a pillow and/or block to this session, if you have them. No worries if not.",
+        "thumbnailUrl": "https://i.ytimg.com/vi/40bPxbFUCj4/maxresdefault.jpg",
+        "videoId": "40bPxbFUCj4"
+    },
+    {
+        "id": 3,
+        "title": "30 Minutes Full Body Deep Stretches Yoga",
+        "category": "Advanced",
+        "duration": "30 min",
+        "instructor": "Emma Thompson",
+        "description": "Welcome to this full body deep stretches Breathe and Flow vinyasa yoga class! Today we're focusing on hip openers, twists, backbends, glutes, hamstrings and shoulder openers. We'll finish the practice with breathwork (sama vritti) in savasana.",
+        "thumbnailUrl": "https://i.ytimg.com/vi/8lkJi4ldZ90/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLA5jH_aT2fXD32t2Fdt53vjjTR1tA",
+        "videoId": "8lkJi4ldZ90"
+    },
+    {
+        "id": 4,
+        "title": "Morning Mobility Yoga | Wake Up and Stretch!",
+        "category": "Beginner",
+        "duration": "22 min",
+        "instructor": "Adriene",
+        "description": "Circulate Synovial Fluid with this well rounded 22-minute morning mobility practice - designed for you to tune into your body and enhance your range of motion so that you can take on daily activities with strength and grace. Morning Mobility practice is also an excellent way to reduce stiffness and tension built up in the body, while also helping you to handle physical and mental stress more effectively.",
+        "thumbnailUrl": "https://i.ytimg.com/vi/2IcWJobNDck/hqdefault.jpg",
+        "videoId": "2IcWJobNDck"
+    },
+    {
+        "id": 5,
+        "title": "Sunday Soul Flow | 25 Min Yoga Class To Reconnect With Yourself",
+        "category": "Intermediate",
+        "duration": "29 min",
+        "instructor": "The Bare Female",
+        "description": "Take 25 minutes to unwind and reconnect with yourself in this soothing yoga flow. This class is perfect for a Sunday reset, guiding you through mindful movements and gentle stretches to release tension and restore inner peace. Open your heart, center your mind, and feel refreshed and ready for the week ahead.",
+        "thumbnailUrl": "https://i.ytimg.com/vi/GyR9T4Bsoo0/maxresdefault.jpg",
+        "videoId": "GyR9T4Bsoo0"
+    }
+]

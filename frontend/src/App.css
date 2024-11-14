@@ -1,0 +1,142 @@
+@font-face {
+  font-family: "Poppins-ExtraBold";
+  src: url("./assets/fonts/Poppins/Poppins-ExtraBold.ttf");
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+@font-face {
+  font-family: "Poppins-semiBold";
+  src: url("./assets/fonts/Poppins/Poppins-SemiBold.ttf");
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+@font-face {
+  font-family: "Poppins-Medium";
+  src: url("./assets/fonts/Poppins/Poppins-Medium.ttf");
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+@font-face {
+  font-family: "Poppins-Regular";
+  src: url("./assets/fonts/Poppins/Poppins-Regular.ttf");
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+@font-face {
+  font-family: "Edu_AU_Variable";
+  src: url("./assets/fonts/Edu_AU_VIC_WA_NT_Pre/EduAUVICWANTPre-VariableFont_wght.ttf");
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+@font-face {
+  font-family: "GreatVibes";
+  src: url("./assets/fonts/Great_Vibes/GreatVibes-Regular.ttf");
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+@font-face {
+  font-family: "Capriola";
+  src: url("./assets/fonts/Capriola/Capriola-Regular.ttf");
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+:root {
+  /* ===== Colors ===== */
+  --body-color: #fdf8f4; /* Soft cream background*/
+  --bg-color: #fefaf5; /* White for main content background */
+  --primary-color: #3d5b3f; /* Darker sage green*/
+  --primary-color-light: #a5c4b7; /* Light sage green*/
+  --secondary-color: #fffefd; /* Soft peach for secondary */
+  --text-color: #4a4a4a; /* Dark gray for text color */
+  --shadow-color: rgba(0, 0, 0, 0.1); /* Soft shadow */
+
+  /* ====== Transition ====== */
+  --tran-03: all 0.2s ease;
+  --tran-03: all 0.3s ease;
+  --tran-04: all 0.3s ease;
+  --tran-05: all 0.3s ease;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins-Medium", sans-serif;
+}
+
+.layout-container {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  background-color: #cdced3;
+}
+
+.main {
+  margin-left: 255px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  transition: var(--tran-05);
+  width: calc(100vw - 255px);
+}
+.main.sideBarClosed {
+  margin-left: 88px;
+  width: calc(100vw - 88px);
+}
+
+.header {
+  height: 60px;
+  background-color: var(--bg-color);
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0 16px;
+  transition: var(--tran-05);
+  box-shadow: inset 1px 0 1px var(--shadow-color);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.content {
+  flex-grow: 1;
+  overflow-y: auto;
+  height: calc(100vh - 60px);
+  background-color: var(--body-color);
+  padding: 15px 20px;
+}
+
+pre {
+  background: rgba(0, 0, 0, 0.07);
+  padding: 13px;
+  border-radius: 13px;
+  color: darkgreen;
+  overflow-x: scroll;
+  scrollbar-width: thin;
+}
+
+code:not(pre code) {
+  background: rgba(0, 0, 0, 0.07);
+  padding: 3px;
+  border-radius: 5px;
+  font-family: sans-serif;
+}

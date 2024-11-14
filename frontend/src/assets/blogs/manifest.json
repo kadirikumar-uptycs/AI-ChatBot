@@ -1,0 +1,46 @@
+[
+    {
+        "id": 1,
+        "title": "40 best quotes about meditation and mindfulness",
+        "mood": "Mindfulness",
+        "author": "Dr. Chris Mosunic, PhD",
+        "readTime": "5 min read",
+        "description": "Got a case of the meditation blahs? We’ve all been there. Just like any practice, your motivation and willingness to meditate can ebb and flow. Maybe your schedule feels extra full, you're dealing with some chronic pain, or you just… don’t feel like it. It’s all normal.",
+        "imageUrl": "https://images.squarespace-cdn.com/content/v1/656f4e4dababbd7c042c4946/0cde8690-6042-491b-9ea7-66bc4abde794/meditation-quotes-3x2.jpg?format=1500w",
+        "category": "Meditation",
+        "blogUrl": "https://www.calm.com/blog/quotes-about-meditation"
+    },
+    {
+        "id": 2,
+        "title": "How does stress affect sleep quality?",
+        "mood": "Peaceful",
+        "author": "Dr. Chris Mosunic, PhD",
+        "readTime": "7 min read",
+        "description": "For many of us, it’s hardest to fall asleep on nights when we need rest the most. Maybe the next morning you have a big test, an important meeting, or an early morning flight, and you crawl into bed early, hoping to get some extra shuteye.",
+        "imageUrl": "https://images.squarespace-cdn.com/content/v1/656f4e4dababbd7c042c4946/531601ac-cf4a-4c01-b9a0-0a8321ce0e01/%28CO%29+how+does+stress+affect+sleep-3x2.jpg?format=1500w",
+        "category": "Wellness",
+        "blogUrl": "https://www.calm.com/blog/how-does-stress-affect-sleep"
+    },
+    {
+        "id": 3,
+        "title": "Mental vs. emotional health: do you know the difference?",
+        "mood": "Self-Discovery",
+        "author": "Dr. Chris Mosunic, PhD",
+        "readTime": "9 min read",
+        "description": "Have you ever felt mentally strong — but still drained? Maybe you’re crushing it at work, checking off every item on  your to-do list, and still finding time to see your friends and family, but something just feels…  off? Or maybe it’s the opposite.",
+        "imageUrl": "https://images.squarespace-cdn.com/content/v1/656f4e4dababbd7c042c4946/1094967c-5837-4cad-af9a-e3f14986bca4/%28SE%29+mental+vs+emotional+health+-+3x2.jpg?format=1500w",
+        "category": "Health",
+        "blogUrl": "https://www.calm.com/blog/mental-vs-emotional-health"
+    },
+    {
+        "id": 4,
+        "title": "11 tips to start meditating daily",
+        "mood": "Growth",
+        "author": "Dr. Chris Mosunic",
+        "readTime": "17 min read",
+        "description": "Developing a meditation practice takes, well, practice. Mental fitness is just like physical fitness: it needs time, dedication, and consistency. We all wish we could do a few sit-ups and see results, but it’s just not realistic.",
+        "imageUrl": "https://images.squarespace-cdn.com/content/v1/656f4e4dababbd7c042c4946/fe29cb80-73da-466d-90ce-8eab52c83a23/%28CO%29+meditate+daily+-+3x2.jpg?format=1500w",
+        "category": "Meditation",
+        "blogUrl": "https://www.calm.com/blog/how-to-start-meditating-daily"
+    }
+]
