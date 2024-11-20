@@ -10,6 +10,7 @@ import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon';
 import CommentIcon from '@mui/icons-material/Comment';
 import GroupRoundedIcon from '@mui/icons-material/GroupRounded';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
+import HowToRegIcon from '@mui/icons-material/HowToReg';
 import CustomTooltip from '../common/CustomTooltip';
 import assets from '../assets';
 import { logout } from '../store/authSlice';
@@ -128,6 +129,14 @@ const SideBar = ({ onToggle }) => {
                             <Link to='users'>
                                 <GroupRoundedIcon className='mui--icon' />
                                 <span className="text nav-text">Users</span>
+                            </Link>
+                        </li>
+                    </CustomTooltip>
+                    <CustomTooltip title={!sideBarOpen && "User Requests"}>
+                        <li className='nav-link'>
+                            <Link to='UserRequests'>
+                                <HowToRegIcon className='mui--icon' />
+                                <span className="text nav-text">User Requests</span>
                             </Link>
                         </li>
                     </CustomTooltip>

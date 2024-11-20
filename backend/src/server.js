@@ -14,6 +14,7 @@ const requestModel = require('./models/requests.js');
 const isAdmin = require('./middleware/isAdmin.js');
 const isAuthenticated = require('./middleware/isAuthenticated.js');
 const userRouter = require('./routes/user.js');
+const userModel = require('./models/user.js');
 require('./passport-setup.js');
 
 
@@ -89,16 +90,16 @@ app.post('/request', async (req, res) => {
     try {
         let { email } = req.body;
         await connectDB();
+        let user = await userModel.findOne({ email })
+        if (user) return res.status(409).send({ error: "User Already Exists" });
         let requests = await requestModel.findOne({
             email, status: 'pending',
         })
         if (requests) {
-            return res.status(200).send({ message: 'Request Already Exists \n Wait until Admin Approves' });
+            return res.status(200).send({ message: 'Request Already Exists, Wait until Admin Approves' });
         }
-        await requestModel.create({
-            email,
-        });
-        return res.status(200).send({ message: 'Request has been sent to Admin!\n' });
+        await requestModel.create({ email });
+        return res.status(200).send({ message: 'Request has been sent to Admin!' });
     } catch (error) {
         console.log(`error while adding New User Request\n${error}`);
         return res.status(500).send({ message: error?.message || 'Internal Server Error' });

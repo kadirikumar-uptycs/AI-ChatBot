@@ -9,7 +9,7 @@ import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import UserMenu from './UserMenu';
 import { useSelector } from 'react-redux';
 
-const UserCard = ({ id, ProfileImage, name, role, phone, email }) => {
+const UserCard = ({ id, ProfileImage, name, role, email }) => {
     const loggedUser = useSelector(state => state.auth);
     const userInfo = loggedUser?.userInfo;
     const isAdmin = userInfo?.role === 'admin';
@@ -52,7 +52,7 @@ const UserCard = ({ id, ProfileImage, name, role, phone, email }) => {
             }
 
             <Avatar
-                alt={name}
+                alt={name || email}
                 src={ProfileImage}
                 slotProps={{ img: { referrerPolicy: 'no-referrer' } }}
                 sx={{
@@ -83,33 +83,32 @@ const UserCard = ({ id, ProfileImage, name, role, phone, email }) => {
                             maxWidth: '100%',
                         }}
                     >
-                        {name}
+                        {name || 'Null'}
                     </Typography>
                 </Tooltip>
 
-                <Typography
-                    level="body2"
-                    color="neutral"
-                    component="div"
-                    sx={{
-                        marginTop: 1,
-                        fontFamily: 'Poppins-SemiBold',
-                        fontWeight: '900',
-                        color: '#928fab'
-                    }}
+                <Tooltip
+                    title={email}
+                    arrow
+                    color='success'
+                    variant='outlined'
+                    placement='bottom'
                 >
-                    {phone}
-                </Typography>
-                <Link
-                    href={`mailto:${email}`}
-                    color="success"
-                    sx={{
-                        fontSize: '17px',
-                        textDecoration: 'none'
-                    }}
-                >
-                    {email}
-                </Link>
+                    <Link
+                        href={`mailto:${email}`}
+                        color="success"
+                        sx={{
+                            fontSize: '17px',
+                            textDecoration: 'none',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            maxWidth: '100%',
+                        }}
+                    >
+                        {email}
+                    </Link>
+                </Tooltip>
             </CardContent>
         </Card>
     );

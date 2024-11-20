@@ -17,6 +17,7 @@ import Jokes from './pages/Jokes';
 import Yoga from './pages/Yoga';
 import ReadOnline from './pages/ReadOnline';
 import Chat from './pages/Chat';
+import UserRequests from './pages/UserRequests';
 import Layout from './Layout';
 import Layout1 from './Layout1';
 import Users from './pages/users/Users';
@@ -36,6 +37,7 @@ const router = createBrowserRouter(
 					<Route path='yoga' element={<Yoga />}></Route>
 					<Route path='chat' element={<Chat />}></Route>
 					<Route path='users' element={<Users />}></Route>
+					<Route path='UserRequests' element={<UserRequests />}></Route>
 				</Route>
 			</Route>
 			<Route path='login' element={<Login />}></Route>
