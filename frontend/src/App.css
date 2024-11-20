@@ -130,7 +130,7 @@ pre {
   padding: 13px;
   border-radius: 13px;
   color: darkgreen;
-  overflow-x: scroll;
+  overflow-x: auto;
   scrollbar-width: thin;
 }
 

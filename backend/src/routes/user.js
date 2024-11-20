@@ -3,6 +3,7 @@ const usertModel = require('../models/user.js');
 const requestModel = require('../models/requests.js');
 const connectDB = require('../config/mongodb.js');
 
+
 userRouter.get('/requests', async (_, res) => {
     try {
         let requests = await requestModel.find({});

@@ -20,9 +20,9 @@ const reply = async (req, res) => {
 
         try {
             const response = await ollama.default.chat({
-                model: 'hf.co/victunes/TherapyLlama-8B-v1-GGUF:Q2_K',
+                model: 'hf.co/victunes/TherapyLlama-8B-v1-GGUF:Q3_K_M',
                 messages: req?.session?.conversationHistory,
-            });
+            },);
 
             if (response?.message?.content) {
                 req.session.conversationHistory.push({
