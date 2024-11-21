@@ -10,6 +10,8 @@ router.use('/images', express.static(path.join(__dirname, '../assets/images'), {
 
 router.get('/', isAuthenticated, (req, res) => res.send(req?.user));
 router.post('/chat', isAuthenticated, controllers.reply);
+router.get('/chatHistory', isAuthenticated, controllers.getHistory);
+router.delete('/chatHistory', isAuthenticated, controllers.clearHistory);
 router.get('/stories', isAuthenticated, controllers.fetchStories);
 router.post('/story', isAuthenticated, controllers.createStory);
 router.put('/story/:id', isAuthenticated, controllers.updateStory);

@@ -1,15 +1,22 @@
 const ollama = require('ollama');
+const clc = require("cli-color");
+
+
+let info = clc.blue;
+let highlight = clc.yellowBright.bgWhiteBright.bold.underline;
+const MODELS = ['hf.co/victunes/TherapyLlama-8B-v1-GGUF:Q2_K', 'hf.co/victunes/TherapyLlama-8B-v1-GGUF:Q3_K_M'];
+const MAX_MESSAGES = 10;
 
 const reply = async (req, res) => {
     try {
-        const { prompt } = req.body;
+        const { prompt, model } = req.body;
 
-        const { firstMessage } = req.query;
+        const choosenModel = (0 <= model && model < MODELS.length) ? MODELS[model] : MODELS.at(-1);
 
-        if (!req?.session?.conversationHistory || firstMessage == 'true') {
+        if (!req?.session?.conversationHistory) {
             req.session.conversationHistory = [{
                 role: 'user',
-                content: `Hi My name is "${req?.user?.name}" ${prompt}`,
+                content: prompt,
             }];
         } else {
             req?.session?.conversationHistory.push({
@@ -18,10 +25,19 @@ const reply = async (req, res) => {
             });
         }
 
+        if (req?.session?.conversationHistory >= MAX_MESSAGES) {
+            return res.status(429).send({ message: 'MAX LIMIT EXCEEDED' });
+        }
+
+        const messagesFeed = req?.session?.conversationHistory?.map((item, index) => {
+            if (index) return item
+            return { ...item, content: `Hi My name is "${req?.user?.name}", ${item.content}` }
+        });
+
         try {
             const response = await ollama.default.chat({
-                model: 'hf.co/victunes/TherapyLlama-8B-v1-GGUF:Q3_K_M',
-                messages: req?.session?.conversationHistory,
+                model: choosenModel,
+                messages: messagesFeed,
             },);
 
             if (response?.message?.content) {
@@ -31,7 +47,9 @@ const reply = async (req, res) => {
                 });
             }
 
-            console.log(response?.message?.content);
+            console.log('\n\nModel:', highlight(choosenModel));
+
+            console.log('\nResponse:', info(response?.message?.content));
 
             return res.status(200).send({ message: response?.message?.content });
 

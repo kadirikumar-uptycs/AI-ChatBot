@@ -9,8 +9,9 @@ import {
     CircularProgress,
     Container,
     Grid,
-    Backdrop
+    Backdrop,
 } from '@mui/material';
+import { IconButton, Tooltip } from '@mui/joy';
 import {
     CheckCircleOutline as ApprovedIcon,
     PendingOutlined as PendingIcon,
@@ -41,7 +42,7 @@ const UserRequests = () => {
 
     useEffect(() => {
         if (isAdmin) {
-            fetchRequests();
+            // fetchRequests();
         }
         // eslint-disable-next-line
     }, []);
@@ -254,26 +255,16 @@ const UserRequests = () => {
                                 }
                             }}
                         >
-                            <Button
-                                variant="outlined"
-                                color="error"
-                                onClick={() => updateStatus(request._id, 'rejected')}
-                                sx={{
-                                    mr: 1,
-                                    '&:hover': {
-                                        background: 'rgba(239, 83, 80, 0.1)'
-                                    }
-                                }}
-                            >
-                                Reject
-                            </Button>
-                            <Button
-                                variant="contained"
-                                color="success"
-                                onClick={() => updateStatus(request._id, 'approved')}
-                            >
-                                Approve
-                            </Button>
+                            <Tooltip title="Reject" arrow color='danger' variant='outlined' placement='right'>
+                                <IconButton color='danger' variant='outlined'>
+                                    <RejectedIcon />
+                                </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Approve" arrow color='success' variant='outlined' placement='left'>
+                                <IconButton color='success' variant='soft'>
+                                    <ApprovedIcon />
+                                </IconButton>
+                            </Tooltip>
                         </Box>
                     )}
 

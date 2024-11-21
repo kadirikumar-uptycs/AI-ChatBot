@@ -1,33 +1,61 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
-import { Box, Typography, TextField, IconButton, CircularProgress, Paper } from '@mui/material';
-import SendIcon from '@mui/icons-material/Send';
+import {
+    Box,
+    Typography,
+    TextField,
+    IconButton,
+    CircularProgress,
+    Paper,
+    Button,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogContentText,
+    DialogActions
+} from '@mui/material';
+import {
+    Delete as DeleteIcon,
+    Warning as WarningIcon,
+    Report as ReportIcon
+} from '@mui/icons-material';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ChatOptions from '../components/ChatOptions';
 import TypeWriter from '../common/TypeWriter';
 import { LoadingWave } from '../common/LoadingWave';
+import { useSnackbar } from '../hooks/SnackBarProvider';
 import { setCurrentPage } from '../store/authSlice';
+import config from '../config';
 
 const Chat = () => {
+    const dispatch = useDispatch();
+    const messagesEndRef = useRef(null);
+    const userName = useSelector(state => state?.auth?.userInfo?.name);
     const [prompt, setPrompt] = useState('');
     const [messages, setMessages] = useState([]);
     const [loading, setLoading] = useState(false);
-    const dispatch = useDispatch();
+    const [pageLoading, setPageLoading] = useState(false);
     const [loadingMessage, setLoadingMessage] = useState('Thinking...');
-    const messagesEndRef = useRef(null);
-    const userName = useSelector(state => state?.auth?.userInfo?.name);
+    const [showConfirmDialog, setConfirmDialog] = useState(false);
+    const [isClearingHistory, setIsClearingHistory] = useState(false);
+    const [currentModel, setCurrentModel] = useState(1);
+
+    const isLimitExceeded = config.MAX_MESSAGES;
+
+    const openSnackbar = useSnackbar();
 
     const handleSubmit = async () => {
-        const isFirstMessage = messages.length === 0;
         if (prompt.trim()) {
             setLoading(true);
             setLoadingMessage('Thinking...');
-            setMessages((prevMessages) => [...prevMessages, { sender: 'You', content: prompt }]);
+            setMessages((prevMessages) => [...prevMessages, { role: 'user', content: prompt }]);
             setPrompt('');
 
             try {
-                const response = await axios.post(`http://localhost:17291/api/chat?firstMessage=${isFirstMessage}`, { prompt }, { withCredentials: true });
+                const response = await axios.post(`http://localhost:17291/api/chat`, { prompt, model: currentModel }, { withCredentials: true });
                 const botMessage = response?.data?.message;
-                setMessages((prevMessages) => [...prevMessages, { sender: 'Therapy Bot', content: botMessage }]);
+                setMessages((prevMessages) => [...prevMessages, { role: 'assistant', content: botMessage }]);
             } catch (error) {
                 console.log(error);
                 setMessages((prevMessages) => [
@@ -45,6 +73,30 @@ const Chat = () => {
         // eslint-disable-next-line
     }, [])
 
+    useEffect(() => {
+        const fetchHistory = async () => {
+            try {
+                setPageLoading(true);
+                const response = await axios.get(`${config.SERVER_BASE_ADDRESS}/api/chatHistory`, { withCredentials: true });
+                const history = response?.data || [];
+                const updatedHistory = history.map(message => message?.role === 'assistant' ? { ...message, old: true } : message)
+                setMessages(updatedHistory);
+                if (!history || !Array.isArray(history) || !history?.length) {
+                    openSnackbar('No Conversations Found', 'warning')
+                }
+            } catch (error) {
+                openSnackbar(error?.response?.data?.message || error?.message || 'Failed to fetch the History', 'danger')
+            } finally {
+                setPageLoading(false);
+                setTimeout(() => {
+                    scrollToBottom();
+                }, 200);
+            }
+        }
+        fetchHistory();
+        // eslint-disable-next-line
+    }, [])
+
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
@@ -56,6 +108,28 @@ const Chat = () => {
             handleSubmit();
         }
     };
+
+    const onNewChat = () => {
+        setConfirmDialog(true);
+    }
+
+    const handleclearHistory = async () => {
+        try {
+            setIsClearingHistory(true);
+            await axios.delete(`${config.SERVER_BASE_ADDRESS}/api/chatHistory`, { withCredentials: true });
+            openSnackbar('Chat History Cleared!');
+            setMessages([]);
+        } catch (error) {
+            openSnackbar(error?.response?.data?.message || error?.message || 'Failed to clear the chat');
+        } finally {
+            setIsClearingHistory(false);
+            setConfirmDialog(false);
+        }
+    }
+
+    const onModelChange = (newModel) => {
+        setCurrentModel(newModel);
+    }
 
     useEffect(() => {
         let timer;
@@ -70,6 +144,21 @@ const Chat = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [loading]);
 
+    if (pageLoading) return (
+        <Box
+            sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100%',
+            }}
+        >
+            <CircularProgress color='success' />
+            <Typography color='success' variant='body1' marginTop={3}>Fetching History...</Typography>
+        </Box>
+    )
+
     return (
         <Box
             sx={{
@@ -78,6 +167,7 @@ const Chat = () => {
                 justifyContent: 'center',
                 alignItems: 'center',
                 height: '100%',
+                position: 'relative',
             }}
         >
             {
@@ -126,7 +216,7 @@ const Chat = () => {
                             sx={{
                                 display: 'flex',
                                 fontFamily: 'Capriola',
-                                justifyContent: message.sender === 'You' ? 'flex-end' : 'flex-start',
+                                justifyContent: message.role === 'user' ? 'flex-end' : 'flex-start',
                                 alignItems: 'center',
                                 gap: '11px',
                                 mb: 2,
@@ -137,16 +227,16 @@ const Chat = () => {
                                 sx={{
                                     p: 2,
                                     borderRadius: 2,
-                                    color: message.sender === 'You' ? 'white' : 'black',
+                                    color: message.role === 'user' ? 'white' : 'black',
                                     whiteSpace: 'pre-wrap',
                                     boxShadow: 'none',
                                     background: 'transparent',
                                     display: 'flex',
-                                    justifyContent: message.sender === 'You' ? 'flex-end' : 'flex-start',
-                                    width: message.sender === 'You' ? '70%' : '100%',
+                                    justifyContent: message.role === 'user' ? 'flex-end' : 'flex-start',
+                                    width: message.role === 'user' ? '70%' : '100%',
                                 }}
                             >
-                                {message.sender === 'Therapy Bot' ? (
+                                {message.role === 'assistant' ? (
                                     <TypeWriter
                                         text={
                                             message?.content
@@ -158,6 +248,7 @@ const Chat = () => {
                                         }
                                         speed={10}
                                         scrollFunction={scrollToBottom}
+                                        disableTypingEffect={message?.old}
                                     />
                                 ) : (
                                     <Typography
@@ -191,48 +282,118 @@ const Chat = () => {
                     <div ref={messagesEndRef} />
                 </Box>
             </Box>
-            <Box
-                sx={{
-                    display: 'flex',
-                    alignItems: 'flex-end',
-                    borderRadius: 3,
-                    width: '43%',
-                    height: 'max(56px, fit-content)',
-                    px: 2,
-                    py: 1,
-                    boxShadow: '0 0 4px rgba(0, 0, 0, 0.1)',
-                    background: '#fff',
-                }}
-            >
-                <TextField
-                    variant="standard"
-                    placeholder="Type your message..."
-                    fullWidth
-                    multiline
-                    value={prompt}
-                    onChange={(e) => setPrompt(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    InputProps={{ disableUnderline: true }}
-                    sx={{
-                        mr: 2,
-                        marginBottom: '5px',
-                        '& .MuiInputBase-root': { fontSize: '1rem', color: '#333' },
-                    }}
+            {!loading &&
+                <ChatOptions
+                    onNewChat={onNewChat}
+                    disableNewChat={!messages.length}
+                    onModelChange={onModelChange}
+                    currentModel={currentModel}
                 />
-                <IconButton
-                    color="primary"
-                    onClick={handleSubmit}
-                    disabled={loading || !prompt.trim()}
+            }
+            {
+                !isLimitExceeded
+                    ?
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'flex-end',
+                            borderRadius: 3,
+                            width: '43%',
+                            height: 'max(56px, fit-content)',
+                            px: 2,
+                            py: 1,
+                            boxShadow: '0 0 4px rgba(0, 0, 0, 0.1)',
+                            background: '#fff',
+                        }}
+                    >
+                        <TextField
+                            variant="standard"
+                            placeholder="Type your message..."
+                            fullWidth
+                            multiline
+                            value={prompt}
+                            onChange={(e) => setPrompt(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                            InputProps={{ disableUnderline: true }}
+                            sx={{
+                                mr: 2,
+                                marginBottom: '5px',
+                                '& .MuiInputBase-root': { fontSize: '1rem', color: '#333' },
+                            }}
+                        />
+                        <IconButton
+                            color="primary"
+                            onClick={handleSubmit}
+                            disabled={loading || !prompt.trim()}
+                            sx={{
+                                bgcolor: 'var(--primary-color)',
+                                color: 'white',
+                                marginBottom: '3px',
+                                '&:hover': { boxShadow: '0 0 3px var(--primary-color)', color: 'rgb(61, 91, 63, 0.8)', bgcolor: 'rgba(0,0,0,0.07)' },
+                            }}
+                        >
+                            <ArrowUpwardIcon />
+                        </IconButton>
+                    </Box>
+                    :
+                    <Box sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        boxShadow: '0 0 3px red',
+                        padding: '11px',
+                        borderRadius: '7px',
+                        gap: 1,
+                        marginTop: '21px',
+                    }}>
+                        <ReportIcon color='error' />
+                        <Typography color='error' variant='body1'>You have hit the max limit of messages, Please start a new chat yourself</Typography>
+                    </Box>
+            }
+
+            {/* Clear History Confirmation */}
+            <Dialog
+                open={showConfirmDialog}
+                onClose={() => !isClearingHistory && setConfirmDialog(false)}
+                aria-labelledby="delete-dialog-title"
+                aria-describedby="delete-dialog-description"
+            >
+                <DialogTitle
+                    id="delete-dialog-title"
                     sx={{
-                        bgcolor: 'var(--primary-color)',
-                        color: 'white',
-                        marginBottom: '3px',
-                        '&:hover': { boxShadow: '0 0 3px var(--primary-color)', color: 'rgb(61, 91, 63, 0.8)', bgcolor: 'rgba(0,0,0,0.07)' },
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1,
+                        color: 'error.main'
                     }}
                 >
-                    <SendIcon sx={{ marginLeft: '3px' }} />
-                </IconButton>
-            </Box>
+                    <WarningIcon color="error" />
+                    Clear History
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="delete-dialog-description">
+                        Are you sure you want to clear the chat history?
+                        This action cannot be undone.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button
+                        onClick={() => setConfirmDialog(false)}
+                        color="inherit"
+                        disabled={isClearingHistory}
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        onClick={handleclearHistory}
+                        variant="contained"
+                        color="error"
+                        disabled={isClearingHistory}
+                        startIcon={isClearingHistory ? <CircularProgress color='error' size={20} /> : <DeleteIcon />}
+                    >
+                        {isClearingHistory ? 'Clearing...' : 'Clear History'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Box>
     );
 };
