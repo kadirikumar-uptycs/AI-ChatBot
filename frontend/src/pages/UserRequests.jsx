@@ -255,12 +255,12 @@ const UserRequests = () => {
                                 }
                             }}
                         >
-                            <Tooltip title="Reject" arrow color='danger' variant='outlined' placement='right'>
+                            <Tooltip title="Reject" arrow color='danger' variant='outlined' placement='right' onClick={() => updateStatus(request?._id, 'rejected')}>
                                 <IconButton color='danger' variant='outlined'>
                                     <RejectedIcon />
                                 </IconButton>
                             </Tooltip>
-                            <Tooltip title="Approve" arrow color='success' variant='outlined' placement='left'>
+                            <Tooltip title="Approve" arrow color='success' variant='outlined' placement='left' onClick={() => updateStatus(request?._id, 'approved')}>
                                 <IconButton color='success' variant='soft'>
                                     <ApprovedIcon />
                                 </IconButton>

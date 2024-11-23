@@ -41,7 +41,7 @@ const Chat = () => {
     const [isClearingHistory, setIsClearingHistory] = useState(false);
     const [currentModel, setCurrentModel] = useState(1);
 
-    const isLimitExceeded = config.MAX_MESSAGES;
+    const isLimitExceeded = messages?.length >= config.MAX_MESSAGES;
 
     const openSnackbar = useSnackbar();
 
