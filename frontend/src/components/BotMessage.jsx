@@ -13,6 +13,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import TypeWriter from '../common/TypeWriter';
 import config from '../config';
 
@@ -21,19 +23,30 @@ const BotMessage = ({ messages, currentModel, onVote, isOldMessage }) => {
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const messagesCount = messages?.length;
     const [selectedModel, setSelectedModel] = useState(currentModel);
+    const [currentMessageIndex, setCurrentMessageIndex] = useState(currentModel !== -1 ? currentModel : 0);
 
     useEffect(() => {
         setSelectedModel(currentModel);
+        if (currentModel !== -1) {
+            setCurrentMessageIndex(currentModel);
+        }
     }, [currentModel]);
 
     if (!messages || messagesCount === 0) {
         return null;
     }
 
-
     const handleVote = (index) => {
         setSelectedModel(index);
         onVote?.(index);
+    };
+
+    const handlePrevious = () => {
+        setCurrentMessageIndex(prev => Math.max(0, prev - 1));
+    };
+
+    const handleNext = () => {
+        setCurrentMessageIndex(prev => Math.min(messagesCount - 1, prev + 1));
     };
 
     const cleanText = (text) => {
@@ -78,6 +91,136 @@ const BotMessage = ({ messages, currentModel, onVote, isOldMessage }) => {
         </Box>
     }
 
+    const NavigationControls = () => (
+        <Box sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: 2,
+        }}>
+            <IconButton
+                onClick={handlePrevious}
+                disabled={currentMessageIndex === 0}
+                sx={{
+                    bgcolor: theme.palette.background.paper,
+                    '&:hover': { bgcolor: theme.palette.action.hover }
+                }}
+            >
+                <NavigateBeforeIcon />
+            </IconButton>
+            <Typography variant="body1">
+                {currentMessageIndex + 1} / {messagesCount}
+            </Typography>
+            <IconButton
+                onClick={handleNext}
+                disabled={currentMessageIndex === messagesCount - 1}
+                sx={{
+                    bgcolor: theme.palette.background.paper,
+                    '&:hover': { bgcolor: theme.palette.action.hover }
+                }}
+            >
+                <NavigateNextIcon />
+            </IconButton>
+        </Box>
+    );
+
+    // If a model is selected, show single message with navigation
+    if (currentModel !== -1) {
+        return (
+            <Box
+                component={motion.div}
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+                sx={{
+                    width: '43%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 3,
+                    alignItems: 'stretch'
+                }}
+            >
+                <Paper
+                    component={motion.div}
+                    variants={itemVariants}
+                    elevation={3}
+                    sx={{
+                        flex: 1,
+                        maxWidth: '800px',
+                        position: 'relative',
+                        background: 'linear-gradient(145deg, rgba(255,255,255,0.9) 0%, rgba(241,241,241,0.9) 100%)',
+                        backdropFilter: 'blur(10px)',
+                        borderRadius: 2,
+                        overflow: 'hidden',
+                        transition: 'all 0.3s ease-in-out',
+                        '&:hover': {
+                            transform: 'translateY(-4px)',
+                            boxShadow: theme.shadows[6]
+                        }
+                    }}
+                >
+                    <Box
+                        sx={{
+                            p: 2,
+                            borderBottom: `1px solid ${theme.palette.divider}`,
+                            background: theme.palette.background.default,
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center'
+                        }}
+                    >
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <AutoAwesomeIcon
+                                sx={{
+                                    color: theme.palette.primary.main,
+                                    animation: 'pulse 2s infinite',
+                                }}
+                            />
+                            <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                                {config.MODEL_OPTIONS[currentMessageIndex].label}
+                            </Typography>
+                        </Box>
+                        {
+                            currentModel === currentMessageIndex
+                            &&
+                            (
+                                <AnimatePresence>
+                                    <motion.div
+                                        initial={{ opacity: 0, scale: 0.8 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        exit={{ opacity: 0, scale: 0.8 }}
+                                    >
+                                        <Chip
+                                            label="Preferred Response"
+                                            color="success"
+                                            icon={<CheckCircleIcon />}
+                                            sx={{
+                                                position: 'absolute',
+                                                top: 16,
+                                                right: 16,
+                                                zIndex: 1
+                                            }}
+                                        />
+                                    </motion.div>
+                                </AnimatePresence>
+                            )
+                        }
+                    </Box>
+
+                    <Box sx={{ p: 3, position: 'relative' }}>
+                        <TypeWriter
+                            text={cleanText(messages[currentMessageIndex])}
+                            speed={10}
+                            disableTypingEffect={isOldMessage}
+                        />
+                    </Box>
+                </Paper>
+                <NavigationControls />
+            </Box>
+        );
+    }
+
+    // side-by-side view when no model is selected
     return (
         <Box
             component={motion.div}
@@ -100,9 +243,7 @@ const BotMessage = ({ messages, currentModel, onVote, isOldMessage }) => {
                     key={index}
                     elevation={3}
                     sx={{
-                        flex: messagesCount === 1 ? '0 1 100%' : 1,
-                        maxWidth: messagesCount === 1 ? '800px' : 'none',
-                        margin: messagesCount === 1 ? '0 auto' : 0,
+                        flex: 1,
                         position: 'relative',
                         background: theme.palette.mode === 'dark'
                             ? 'linear-gradient(145deg, rgba(66,66,66,0.7) 0%, rgba(33,33,33,0.9) 100%)'
@@ -117,7 +258,6 @@ const BotMessage = ({ messages, currentModel, onVote, isOldMessage }) => {
                         }
                     }}
                 >
-                    {/* Model Header */}
                     <Box
                         sx={{
                             p: 2,
@@ -132,39 +272,31 @@ const BotMessage = ({ messages, currentModel, onVote, isOldMessage }) => {
                             <AutoAwesomeIcon
                                 sx={{
                                     color: theme.palette.primary.main,
-                                    animation: messagesCount > 1 ? 'pulse 2s infinite' : 'none',
-                                    '@keyframes pulse': {
-                                        '0%': { opacity: 1 },
-                                        '50%': { opacity: 0.5 },
-                                        '100%': { opacity: 1 }
-                                    }
+                                    animation: 'pulse 2s infinite',
                                 }}
                             />
                             <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                                {messagesCount > 1 ? config.MODEL_OPTIONS[index].label : 'Response'}
+                                {config.MODEL_OPTIONS[index].label}
                             </Typography>
                         </Box>
 
-                        {messagesCount > 1 && (
-                            <Tooltip title={selectedModel === index ? "Preferred!" : "I prefer this"}>
-                                <span>
-                                    <IconButton
-                                        disabled={selectedModel >= 0}
-                                        onClick={() => handleVote(index)}
-                                        sx={{
-                                            color: selectedModel === index ? theme.palette.success.main : theme.palette.text.secondary,
-                                            transform: selectedModel === index ? 'scale(1.1)' : 'scale(1)',
-                                            transition: 'all 0.2s ease-in-out'
-                                        }}
-                                    >
-                                        <ThumbUpAltIcon />
-                                    </IconButton>
-                                </span>
-                            </Tooltip>
-                        )}
+                        <Tooltip title={selectedModel === index ? "Preferred!" : "I prefer this"}>
+                            <span>
+                                <IconButton
+                                    disabled={selectedModel >= 0}
+                                    onClick={() => handleVote(index)}
+                                    sx={{
+                                        color: selectedModel === index ? theme.palette.success.main : theme.palette.text.secondary,
+                                        transform: selectedModel === index ? 'scale(1.1)' : 'scale(1)',
+                                        transition: 'all 0.2s ease-in-out'
+                                    }}
+                                >
+                                    <ThumbUpAltIcon />
+                                </IconButton>
+                            </span>
+                        </Tooltip>
                     </Box>
 
-                    {/* Response Content */}
                     <Box sx={{ p: 3, position: 'relative' }}>
                         <TypeWriter
                             text={cleanText(response)}
@@ -173,7 +305,6 @@ const BotMessage = ({ messages, currentModel, onVote, isOldMessage }) => {
                         />
                     </Box>
 
-                    {/* Selected Model Indicator */}
                     <AnimatePresence>
                         {selectedModel === index && (
                             <motion.div

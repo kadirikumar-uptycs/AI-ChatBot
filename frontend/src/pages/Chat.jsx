@@ -60,7 +60,7 @@ const Chat = () => {
             try {
                 const response = await axios.post(`http://localhost:17291/api/chat`, { prompt, model: currentModel }, { withCredentials: true });
                 const botMessage = response?.data?.content;
-                setMessages((prevMessages) => [...prevMessages, { role: 'assistant', content: botMessage }]);
+                setMessages((prevMessages) => [...prevMessages.map(message => ({ ...message, old: true })), { role: 'assistant', content: botMessage }]);
                 scrollToBottom();
             } catch (error) {
                 console.log(error);
@@ -76,12 +76,12 @@ const Chat = () => {
 
 
     const onModelPreference = async (preferredModel) => {
+        setCurrentModel(preferredModel);
         try {
             await axios.post(`${config.SERVER_BASE_ADDRESS}/api/modelPreference`,
                 { model: preferredModel },
                 { withCredentials: true },
             );
-            setCurrentModel(preferredModel);
         } catch (error) {
             console.log(error);
             openSnackbar(error?.response?.data?.message || 'Error while choosing the preferred model');
@@ -170,7 +170,7 @@ const Chat = () => {
     useEffect(() => {
         let timer;
         if (loading) {
-            if (loadingMessage === 'Thinking...'){
+            if (loadingMessage === 'Thinking...') {
                 scrollToBottom();
             }
             timer = setTimeout(() => setLoadingMessage('Just a moment...'), 5000);
@@ -259,7 +259,6 @@ const Chat = () => {
                                 alignItems: 'center',
                                 gap: '11px',
                                 width: message?.role === 'user' ? '43%' : '100%',
-                                mb: 2,
                             }}
                         >
                             <Paper
