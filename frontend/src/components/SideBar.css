@@ -100,6 +100,7 @@
     height: 50px;
     border-radius: 6px;
     position: relative;
+    filter: hue-rotate(304deg);
     top: 10px;
     left: -10px;
   }
