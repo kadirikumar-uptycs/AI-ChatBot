@@ -1,5 +1,6 @@
 const reply = require('./reply');
 const getHistory = require('./getHistory');
+const selectModel = require('./selectModel');
 const clearHistory = require('./clearHistory');
 const createStory = require('./createStory');
 const fetchStories = require('./fetchStories');
@@ -11,6 +12,7 @@ const fetchSong = require('./fetchSong');
 module.exports = {
     reply,
     getHistory,
+    selectModel,
     clearHistory,
     createStory,
     fetchStories,

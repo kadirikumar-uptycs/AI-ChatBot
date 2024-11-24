@@ -4,59 +4,70 @@ const clc = require("cli-color");
 
 let info = clc.blue;
 let highlight = clc.yellowBright.bgWhiteBright.bold.underline;
-const MODELS = ['hf.co/victunes/TherapyLlama-8B-v1-GGUF:Q2_K', 'hf.co/victunes/TherapyLlama-8B-v1-GGUF:Q3_K_M'];
+const MODELS = ['hf.co/victunes/TherapyLlama-8B-v1-GGUF:Q3_K_M', 'hf.co/victunes/TherapyLlama-8B-v1-GGUF:Q2_K'];
 const MAX_MESSAGES = 10;
 
 const reply = async (req, res) => {
     try {
         const { prompt, model } = req.body;
 
-        const choosenModel = (0 <= model && model < MODELS.length) ? MODELS[model] : MODELS.at(-1);
+        const choosenModels = model <= -1 ? [...MODELS] : [MODELS[model]];
 
-        if (!req?.session?.conversationHistory) {
-            req.session.conversationHistory = [{
-                role: 'user',
-                content: prompt,
-            }];
-        } else {
-            req?.session?.conversationHistory.push({
-                role: 'user',
-                content: prompt
-            });
-        }
+        const modelResponses = [];
 
-        if (req?.session?.conversationHistory >= MAX_MESSAGES) {
-            return res.status(429).send({ message: 'MAX LIMIT EXCEEDED' });
-        }
+        if (!req?.session) return res.status(401).send({ message: 'Unauthorized' });
 
-        const messagesFeed = req?.session?.conversationHistory?.map((item, index) => {
-            if (index) return item
-            return { ...item, content: `Hi My name is "${req?.user?.name}", ${item.content}` }
+        req.session.conversationHistory ??= {
+            model,
+            messages: [],
+        };
+
+        req?.session?.conversationHistory?.messages.push({
+            role: 'user',
+            content: prompt
         });
 
-        try {
-            const response = await ollama.default.chat({
-                model: choosenModel,
-                messages: messagesFeed,
-            },);
-
-            if (response?.message?.content) {
-                req.session.conversationHistory.push({
-                    role: 'assistant',
-                    content: response?.message?.content
-                });
-            }
-
-            console.log('\n\nModel:', highlight(choosenModel));
-
-            console.log('\nResponse:', info(response?.message?.content));
-
-            return res.status(200).send({ message: response?.message?.content });
-
-        } catch (error) {
-            console.error('Ollama interaction error:', error);
-            return res.status(500).send({ message: error?.message || 'Error interacting with the model' });
+        if (req?.session?.conversationHistory?.messages >= MAX_MESSAGES) {
+            return res.status(429).send({ message: 'MAX LIMIT EXCEEDED. START NEW CHART' });
         }
+
+
+        for (let index = 0; index < choosenModels.length; index++) {
+
+            let messagesFeed = req?.session?.conversationHistory?.messages?.map((item, index) => {
+                if (!index) return { ...item, content: `Hi My name is "${req?.user?.name}", ${item.content}` }
+                if (item?.role === 'user') return item
+                return {
+                    ...item,
+                    content: item?.content[index] || item?.content[0],
+                }
+            });
+
+            try {
+                const response = await ollama.default.chat({
+                    model: choosenModels[index],
+                    messages: messagesFeed,
+                },);
+
+                modelResponses.push(response?.message?.content)
+
+
+                console.log('\n\nModel:', highlight(choosenModels[index]));
+
+                console.log('\nResponse:', info(response?.message?.content));
+
+
+            } catch (error) {
+                console.error('Ollama interaction error:', error);
+                return res.status(500).send({ message: error?.message || 'Error interacting with the model' });
+            }
+        }
+        req.session.conversationHistory.messages.push({
+            role: 'assistant',
+            content: modelResponses
+        });
+        return res.status(200).send({ content: modelResponses });
+
     } catch (error) {
         console.error('Server error:', error);
         return res.status(500).send({

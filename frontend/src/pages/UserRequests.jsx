@@ -42,7 +42,7 @@ const UserRequests = () => {
 
     useEffect(() => {
         if (isAdmin) {
-            // fetchRequests();
+            fetchRequests();
         }
         // eslint-disable-next-line
     }, []);

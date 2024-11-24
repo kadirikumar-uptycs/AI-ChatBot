@@ -5,7 +5,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import Tooltip from '@mui/material/Tooltip';
 import { marked } from 'marked';
 
-const TypeWriter = ({ text, speed, scrollFunction, disableCopy, styles = {}, disableTypingEffect }) => {
+const TypeWriter = ({ text, speed, disableCopy, styles = {}, disableTypingEffect }) => {
     const [displayedText, setDisplayedText] = useState({ index: -1, text: disableTypingEffect ? text : '' });
     const [isTyping, setIsTyping] = useState(!Boolean(disableTypingEffect));
     const [isCopied, setIsCopied] = useState(false);
@@ -36,7 +36,6 @@ const TypeWriter = ({ text, speed, scrollFunction, disableCopy, styles = {}, dis
             }
         };
         if (!disableTypingEffect) {
-            scrollFunction?.();
             typeText(0);
         }
         // eslint-disable-next-line

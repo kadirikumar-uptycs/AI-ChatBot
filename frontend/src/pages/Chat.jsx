@@ -21,9 +21,11 @@ import {
     Report as ReportIcon
 } from '@mui/icons-material';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
 import ChatOptions from '../components/ChatOptions';
 import TypeWriter from '../common/TypeWriter';
 import { LoadingWave } from '../common/LoadingWave';
+import BotMessage from '../components/BotMessage';
 import { useSnackbar } from '../hooks/SnackBarProvider';
 import { setCurrentPage } from '../store/authSlice';
 import config from '../config';
@@ -38,10 +40,13 @@ const Chat = () => {
     const [pageLoading, setPageLoading] = useState(false);
     const [loadingMessage, setLoadingMessage] = useState('Thinking...');
     const [showConfirmDialog, setConfirmDialog] = useState(false);
+    const [showModelChangeConfirmDialog, setShowModelChangeConfirmDialog] = useState(false);
     const [isClearingHistory, setIsClearingHistory] = useState(false);
+    const [isChangingModel, setIsChangingModel] = useState(false);
     const [currentModel, setCurrentModel] = useState(1);
+    const [newModel, setNewModel] = useState(currentModel);
 
-    const isLimitExceeded = messages?.length >= config.MAX_MESSAGES;
+    const isLimitExceeded = messages?.length >= config.MAX_MESSAGES * 2;
 
     const openSnackbar = useSnackbar();
 
@@ -54,8 +59,9 @@ const Chat = () => {
 
             try {
                 const response = await axios.post(`http://localhost:17291/api/chat`, { prompt, model: currentModel }, { withCredentials: true });
-                const botMessage = response?.data?.message;
+                const botMessage = response?.data?.content;
                 setMessages((prevMessages) => [...prevMessages, { role: 'assistant', content: botMessage }]);
+                scrollToBottom();
             } catch (error) {
                 console.log(error);
                 setMessages((prevMessages) => [
@@ -68,6 +74,20 @@ const Chat = () => {
         }
     };
 
+
+    const onModelPreference = async (preferredModel) => {
+        try {
+            await axios.post(`${config.SERVER_BASE_ADDRESS}/api/modelPreference`,
+                { model: preferredModel },
+                { withCredentials: true },
+            );
+            setCurrentModel(preferredModel);
+        } catch (error) {
+            console.log(error);
+            openSnackbar(error?.response?.data?.message || 'Error while choosing the preferred model');
+        }
+    }
+
     useLayoutEffect(() => {
         dispatch(setCurrentPage('Chat with Therapy Bot'))
         // eslint-disable-next-line
@@ -78,11 +98,12 @@ const Chat = () => {
             try {
                 setPageLoading(true);
                 const response = await axios.get(`${config.SERVER_BASE_ADDRESS}/api/chatHistory`, { withCredentials: true });
-                const history = response?.data || [];
-                const updatedHistory = history.map(message => message?.role === 'assistant' ? { ...message, old: true } : message)
-                setMessages(updatedHistory);
-                if (!history || !Array.isArray(history) || !history?.length) {
-                    openSnackbar('No Conversations Found', 'warning')
+                const conversationHistory = response?.data || { messages: [], model: 0 };
+                const conversationMessages = conversationHistory?.messages?.map(message => message?.role === 'assistant' ? { ...message, old: true } : message)
+                setMessages(conversationMessages);
+                setCurrentModel(conversationHistory?.model || 0);
+                if (!conversationMessages || !Array.isArray(conversationMessages) || !conversationMessages?.length) {
+                    openSnackbar('No Conversations Found', 'warning');
                 }
             } catch (error) {
                 openSnackbar(error?.response?.data?.message || error?.message || 'Failed to fetch the History', 'danger')
@@ -113,28 +134,45 @@ const Chat = () => {
         setConfirmDialog(true);
     }
 
-    const handleclearHistory = async () => {
+    const handleclearHistory = async (requestedModelChange) => {
         try {
-            setIsClearingHistory(true);
+            if (requestedModelChange) {
+                setIsChangingModel(true);
+            } else {
+                setIsClearingHistory(true);
+            }
+
             await axios.delete(`${config.SERVER_BASE_ADDRESS}/api/chatHistory`, { withCredentials: true });
-            openSnackbar('Chat History Cleared!');
             setMessages([]);
         } catch (error) {
-            openSnackbar(error?.response?.data?.message || error?.message || 'Failed to clear the chat');
+            openSnackbar(error?.response?.data?.message || error?.message || 'Failed to clear the chat', 'danger');
         } finally {
-            setIsClearingHistory(false);
-            setConfirmDialog(false);
+            if (requestedModelChange) {
+                setIsChangingModel(false);
+                setShowModelChangeConfirmDialog(false);
+                setCurrentModel(newModel);
+            } else {
+                setIsClearingHistory(false);
+                setConfirmDialog(false);
+            }
         }
     }
 
     const onModelChange = (newModel) => {
-        setCurrentModel(newModel);
+        if (messages.length) {
+            setShowModelChangeConfirmDialog(true);
+            setNewModel(newModel);
+        } else {
+            setCurrentModel(newModel);
+        }
     }
 
     useEffect(() => {
         let timer;
         if (loading) {
-            if (loadingMessage === 'Thinking...') scrollToBottom();
+            if (loadingMessage === 'Thinking...'){
+                scrollToBottom();
+            }
             timer = setTimeout(() => setLoadingMessage('Just a moment...'), 5000);
             timer = setTimeout(() => setLoadingMessage("Hold on, I'm processing your request...."), 10000);
             setTimeout(() => setLoadingMessage('Almost there...'), 15000);
@@ -206,7 +244,8 @@ const Chat = () => {
                     sx={{
                         display: 'flex',
                         flexDirection: 'column',
-                        width: '43%',
+                        alignItems: 'center',
+                        width: '100%',
                         paddingBottom: '30px',
                     }}
                 >
@@ -219,6 +258,7 @@ const Chat = () => {
                                 justifyContent: message.role === 'user' ? 'flex-end' : 'flex-start',
                                 alignItems: 'center',
                                 gap: '11px',
+                                width: message?.role === 'user' ? '43%' : '100%',
                                 mb: 2,
                             }}
                         >
@@ -232,23 +272,16 @@ const Chat = () => {
                                     boxShadow: 'none',
                                     background: 'transparent',
                                     display: 'flex',
-                                    justifyContent: message.role === 'user' ? 'flex-end' : 'flex-start',
+                                    justifyContent: message.role === 'user' ? 'flex-end' : 'center',
                                     width: message.role === 'user' ? '70%' : '100%',
                                 }}
                             >
                                 {message.role === 'assistant' ? (
-                                    <TypeWriter
-                                        text={
-                                            message?.content
-                                                .replace(/<\|im_heart\|>/g, '❤️')
-                                                .replace(/<\|im_ended\|>/g, '')
-                                                .replace(/<\|im_endo\|>/g, '')
-                                                .replace(/<\/?s>/g, '')
-                                                .replace(/<\/s/, '')
-                                        }
-                                        speed={10}
-                                        scrollFunction={scrollToBottom}
-                                        disableTypingEffect={message?.old}
+                                    <BotMessage
+                                        messages={message?.content}
+                                        currentModel={currentModel}
+                                        onVote={onModelPreference}
+                                        isOldMessage={message?.old}
                                     />
                                 ) : (
                                     <Typography
@@ -260,6 +293,12 @@ const Chat = () => {
                                             padding: '11px',
                                             width: 'fit-content',
                                             maxWidth: '100%',
+                                            overflowY: 'auto',
+                                            overflowWrap: 'break-word',
+                                            wordWrap: 'break-word',
+                                            whiteSpace: 'pre-wrap',
+                                            wordBreak: 'break-word',
+                                            hyphens: 'auto',
                                         }}
                                     >{message.content}
                                     </Typography>
@@ -273,6 +312,7 @@ const Chat = () => {
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'flex-start',
+                                width: '43%'
                             }}
                         >
                             <CircularProgress size={24} sx={{ mr: 2 }} color='success' />
@@ -384,13 +424,58 @@ const Chat = () => {
                         Cancel
                     </Button>
                     <Button
-                        onClick={handleclearHistory}
+                        onClick={() => { handleclearHistory(false) }}
                         variant="contained"
                         color="error"
                         disabled={isClearingHistory}
                         startIcon={isClearingHistory ? <CircularProgress color='error' size={20} /> : <DeleteIcon />}
                     >
                         {isClearingHistory ? 'Clearing...' : 'Clear History'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Model Change Confirmation */}
+            <Dialog
+                open={showModelChangeConfirmDialog}
+                onClose={() => !isChangingModel && setShowModelChangeConfirmDialog(false)}
+                aria-labelledby="change-model-dialog-title"
+                aria-describedby="change-model-dialog-description"
+            >
+                <DialogTitle
+                    id="change-model-dialog-title"
+                    sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1,
+                        color: 'error.main'
+                    }}
+                >
+                    <WarningIcon color="error" />
+                    Change Model
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="change-model-dialog-description">
+                        Are you sure you want to change the model?
+                        This can erase the current conversation history.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button
+                        onClick={() => setShowModelChangeConfirmDialog(false)}
+                        color="inherit"
+                        disabled={isChangingModel}
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        onClick={() => { handleclearHistory(true) }}
+                        variant="contained"
+                        color="error"
+                        disabled={isChangingModel}
+                        startIcon={isChangingModel ? <CircularProgress color='error' size={20} /> : <ChangeCircleIcon />}
+                    >
+                        {isClearingHistory ? 'Changing...' : 'Change Model'}
                     </Button>
                 </DialogActions>
             </Dialog>

@@ -11,14 +11,14 @@ import Tooltip from '@mui/joy/Tooltip';
 import NewReleasesRoundedIcon from '@mui/icons-material/NewReleasesRounded';
 import StarRoundedIcon from '@mui/icons-material/StarRounded';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-// import StreamIcon from '@mui/icons-material/Stream';
+import StreamIcon from '@mui/icons-material/Stream';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import LoupeIcon from '@mui/icons-material/Loupe';
 
 const MODEL_OPTIONS = [
-    { value: 1, label: 'Model 2 (V2)', icon: <NewReleasesRoundedIcon /> },
-    { value: 0, label: 'Model 1 (V1)', icon: <StarRoundedIcon /> },
-    // { value: -1, label: 'All', icon: <StreamIcon /> }
+    { value: 0, label: 'Model 2 (V2)', icon: <NewReleasesRoundedIcon /> },
+    { value: 1, label: 'Model 1 (V1)', icon: <StarRoundedIcon /> },
+    { value: -1, label: 'All', icon: <StreamIcon /> }
 ];
 
 const ChatOptions = ({
