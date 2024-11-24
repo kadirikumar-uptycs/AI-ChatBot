@@ -67,7 +67,7 @@ const Users = () => {
 
     const filterUsers = (query) => {
         const queryLower = query.toLowerCase();
-        setFilteredUsers(users.filter(user => user.name.toLowerCase().includes(queryLower)));
+        setFilteredUsers(users.filter(user => !user?.name || user?.name?.toLowerCase()?.includes(queryLower)));
     };
 
     const getUserById = (id) => {

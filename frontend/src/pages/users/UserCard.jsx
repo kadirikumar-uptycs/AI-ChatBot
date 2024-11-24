@@ -83,7 +83,7 @@ const UserCard = ({ id, ProfileImage, name, role, email }) => {
                             maxWidth: '100%',
                         }}
                     >
-                        {name || 'Null'}
+                        {name || 'UNKNOWN 🤷'}
                     </Typography>
                 </Tooltip>
 
